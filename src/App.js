@@ -1,0 +1,111 @@
+import React, { Component } from 'react';
+import logo from './logo.svg';
+import './App.css';
+import Radium, {StyleRoot} from 'radium';
+import Pessoa from './Pessoa/Pessoa'; 
+
+class App extends Component {
+
+  state = {  
+    pessoas: [
+     {id:'1', nome: 'Tom', idade: 21},
+     {id:'2', nome: 'Julia', idade: 22},
+     {id:'3', nome: 'William', idade: 23}
+    ],
+    outroState: 'algum outro valor',
+    mostrarPessoas: false
+  }  
+  
+  nomeManipuladorAlterado = (event, id) => {
+    const pessoaIndex = this.state.pessoas.findIndex(p => {
+      return p.id === id;
+    });
+    
+    const pessoa = {
+      ...this.state.pessoas[pessoaIndex]
+    };
+
+    // alternativa para a l de cima const pessoa = Object.assign({}, this.state.pessoas[pessoaIndex]);
+
+    pessoa.nome = event.target.value;
+
+    const pessoas = [...this.state.pessoas];
+    pessoas[pessoaIndex] = pessoa;
+
+    this.setState({pessoas: pessoas});
+  }
+
+  apagarManipuladorPessoa = (pessoaIndex) => {
+    //const pessoas = this.state.pessoas.slice();
+    const pessoas = [...this.state.pessoas];
+    pessoas.splice(pessoaIndex, 1);
+    this.setState({pessoas: pessoas});
+  }
+
+  toogleManipuladorPessoas = () => {
+    const fazerMostrar = this.state.mostrarPessoas;
+    this.setState({mostrarPessoas: !fazerMostrar});
+  }
+
+  render() {
+    const estilo = {
+      backgroundColor: 'green',
+      color: 'white',
+      font: 'inherit',
+      border: '1x solid blue',
+      padding: '8px',
+      cursor: 'pointer',
+      ':hover': {
+        backgroundColor: 'lightgreen',
+        color: 'black'
+      }
+    }
+
+    let pessoas = null;
+    if (this.state.mostrarPessoas) {
+      pessoas = (
+        <div>
+        {this.state.pessoas.map((pessoa, index) => {
+          return <Pessoa 
+          click={() => this.apagarManipuladorPessoa(index)}
+          nome={pessoa.nome} 
+          idade={pessoa.idade}
+          key={pessoa.id}
+          changed={(event) => this.nomeManipuladorAlterado(event, pessoa.id)}/>
+        })}
+        </div>
+      );
+      estilo.backgroundColor = 'red';
+      estilo[':hover'] = {
+        backgroundColor: 'orange',
+        color: 'black'
+      }
+    }
+
+    const classes = [];
+    if (this.state.pessoas.length <= 2) {
+      classes.push('vermelho');  //classes = ['vermelho']
+    }
+    if (this.state.pessoas.length <= 1) {
+      classes.push('negrito');  //classes = ['vermelho', 'negrito']
+    }
+
+
+    return (
+      <StyleRoot>
+      <div className="App">
+        <h1>Olá, Sou um aplicativo React</h1>
+        <p className={classes.join(' ')}>Isto está funcionando</p>
+        <button 
+        style={estilo}
+        onClick={this.toogleManipuladorPessoas}>Alternancia de Pessoas
+        </button> 
+        {pessoas}
+      </div> 
+      </StyleRoot>
+    ); 
+  }
+}
+
+export default Radium(App);
+
